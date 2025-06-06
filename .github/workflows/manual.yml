@@ -62,7 +62,7 @@ jobs:
               echo "🚫 Backport PR already open: $BACKPORT_PR_EXISTS"
               jq --arg repo "$REPO_NAME" --arg info "Backport PR already open: $BACKPORT_PR_EXISTS" \
                 '.apps_with_no_release += [{"repo_name": $repo, "info": $info}]' results/release-branch-report.json > tmp && mv tmp results/release-branch-report.json
-              continue
+              exit 0
             fi
           
           RELEASE_BRANCH="release/$RELEASE_VERSION"
