@@ -57,6 +57,7 @@ jobs:
            BACKPORT_PR_EXISTS=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
               "https://api.github.com/repos/$ORG/$MAIN_REPO/pulls?state=open&base=master" | \
               jq -r '.[] | select(.title | test("Backport"; "i")) | .html_url' | head -n 1)
+            echo "Backport existe?: $BACKPORT_PR_EXISTS"
             if [[ -n "$BACKPORT_PR_EXISTS" ]]; then
               echo "🚫 Backport PR already open: $BACKPORT_PR_EXISTS"
               jq --arg repo "$REPO_NAME" --arg info "Backport PR already open: $BACKPORT_PR_EXISTS" \
