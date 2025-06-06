@@ -73,7 +73,7 @@ jobs:
           
           # Hacer push de la rama de release al repositorio
           echo "Haciendo push de la rama release"
-          REPO_URL="https://x-access-token:${{$GH_TOKEN}}@github.com/${{ github.repository }}.git"
+          REPO_URL="https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git"
           echo "push completado de la rama release"
           
 
