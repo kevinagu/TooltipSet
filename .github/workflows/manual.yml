@@ -65,7 +65,7 @@ jobs:
           fi
           
           echo "🚀 Creando rama de release $RELEASE_BRANCH desde master"
-          echo "🔍 El token es"
+          echo "🔍 El token es: $GH_TOKEN"
           # Crear la rama de release desde master
           git checkout master
           git pull origin master
