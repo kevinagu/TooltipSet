@@ -28,9 +28,6 @@ jobs:
           fetch-depth: 0
           token: ${{ env.GH_TOKEN }}
       
-      - name: Configure Git
-        run: |
-          git config --global url."https://github.com/".insteadOf "git@github.com:"
 
       - name: Create release branches and PRs if needed
         if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.skip_next_schedule == false)
