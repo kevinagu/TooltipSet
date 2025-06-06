@@ -53,6 +53,16 @@ jobs:
             NEXT_MINOR=$((CURRENT_MINOR + 1))
             RELEASE_VERSION="$CURRENT_MAJOR.$NEXT_MINOR.0"
           fi
+
+           BACKPORT_PR_EXISTS=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
+              "https://api.github.com/repos/$ORG/$REPO/pulls?state=open&base=master" | \
+              jq -r '.[] | select(.title | test("Backport"; "i")) | .html_url' | head -n 1)
+            if [[ -n "$BACKPORT_PR_EXISTS" ]]; then
+              echo "🚫 Backport PR already open: $BACKPORT_PR_EXISTS"
+              jq --arg repo "$REPO_NAME" --arg info "Backport PR already open: $BACKPORT_PR_EXISTS" \
+                '.apps_with_no_release += [{"repo_name": $repo, "info": $info}]' results/release-branch-report.json > tmp && mv tmp results/release-branch-report.json
+              continue
+            fi
           
           RELEASE_BRANCH="release/$RELEASE_VERSION"
           
