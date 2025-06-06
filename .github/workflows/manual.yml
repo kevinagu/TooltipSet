@@ -38,7 +38,7 @@ jobs:
           
           echo "🔍 Verificando el repositorio: $GITHUB_REPOSITORY"
           
-            echo "🔍 Verificando el repositorio: $GH_TOKENY"
+          echo "🔍 El token es: $GH_TOKENY"
           # Obtener la última etiqueta de versión
           LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
           echo "Lastest tag es: $LATEST_TAG"
