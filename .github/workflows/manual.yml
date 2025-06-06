@@ -70,12 +70,10 @@ jobs:
           git checkout master
           git pull origin master
           git checkout -b $RELEASE_BRANCH
-          git push origin $RELEASE_BRANCH
-          
           # Hacer push de la rama de release al repositorio
-          echo "Haciendo push de la rama release"
-          REPO_URL="https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git"
+          git push origin $RELEASE_BRANCH
           echo "push completado de la rama release"
+
           
 
       
