@@ -29,7 +29,7 @@ jobs:
           token: ${{ env.GH_TOKEN }}
       
 
-      - name: Create release branches and PRs if needed
+      - name: Create release branch
         if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.skip_next_schedule == false)
         run: |
           # Crear directorio para resultados
@@ -42,8 +42,8 @@ jobs:
           LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
           echo "Lastest tag es: $LATEST_TAG"
           if [[ -z "$LATEST_TAG" ]] || ! [[ "$LATEST_TAG" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "🚫 No se encontró una etiqueta semántica válida, usando 4.28000.0 como versión predeterminada"
-            RELEASE_VERSION="4.28000.0"
+            echo "🚫 No se encontró una etiqueta semántica válida, usando 1.0.0 como versión predeterminada"
+            RELEASE_VERSION="1.0.0"
           else
             # Calcular la siguiente versión
             VERSION=$(echo "$LATEST_TAG" | sed 's/^v//')
