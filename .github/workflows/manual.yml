@@ -1,0 +1,85 @@
+name: Create release branches across multiple repos
+
+on:
+  schedule:
+    - cron: '0 23 * * 5' # Viernes 18:00 UTC-5 (23:00 UTC)
+  workflow_dispatch:
+    inputs:
+      skip_next_schedule:
+        description: 'Skip the next scheduled execution (only affects the next Thursday run)'
+        required: false
+        type: boolean
+        default: false
+
+
+jobs:
+  create-release-branches:
+    runs-on: ubuntu-latest
+
+    env:
+      ORG: melisource
+      MAIN_REPO: TooltipSet
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ env.GH_TOKEN }}
+      
+      - name: Configure Git
+        run: |
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+
+      - name: Create release branches and PRs if needed
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.skip_next_schedule == false)
+        run: |
+          # Crear directorio para resultados
+          mkdir -p results
+          echo '{"release_info": {}}' > results/release-branch-report.json
+          
+          echo "🔍 Verificando el repositorio: $GITHUB_REPOSITORY"
+          
+          
+          # Obtener la última etiqueta de versión
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          echo "Lastest tag es: $LATEST_TAG"
+          if [[ -z "$LATEST_TAG" ]] || ! [[ "$LATEST_TAG" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "🚫 No se encontró una etiqueta semántica válida, usando 4.28000.0 como versión predeterminada"
+            RELEASE_VERSION="4.28000.0"
+          else
+            # Calcular la siguiente versión
+            VERSION=$(echo "$LATEST_TAG" | sed 's/^v//')
+            CURRENT_MAJOR=$(echo "$VERSION" | cut -d. -f1)
+            CURRENT_MINOR=$(echo "$VERSION" | cut -d. -f2)
+            CURRENT_PATCH=$(echo "$VERSION" | cut -d. -f3)
+            NEXT_MINOR=$((CURRENT_MINOR + 1))
+            RELEASE_VERSION="$CURRENT_MAJOR.$NEXT_MINOR.0"
+          fi
+          
+          RELEASE_BRANCH="release/$RELEASE_VERSION"
+          
+          # Verificar si la rama de release ya existe
+          if git show-ref --quiet refs/heads/$RELEASE_BRANCH || git show-ref --quiet refs/remotes/origin/$RELEASE_BRANCH; then
+            echo "🚫 La rama de release $RELEASE_BRANCH ya existe"
+            jq --arg branch "$RELEASE_BRANCH" \
+              '.release_info += {"status": "skipped", "info": "La rama de release ya existe", "branch": $branch}' results/release-branch-report.json > tmp && mv tmp results/release-branch-report.json
+            exit 0
+          fi
+          
+          echo "🚀 Creando rama de release $RELEASE_BRANCH desde master"
+          
+          # Crear la rama de release desde master
+          git checkout master
+          git pull origin master
+          git checkout -b $RELEASE_BRANCH
+          
+          # Hacer push de la rama de release al repositorio
+          echo "Haciendo push de la rama release"
+          REPO_URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          echo "push completado de la rama release"
+          
+
+      
+
