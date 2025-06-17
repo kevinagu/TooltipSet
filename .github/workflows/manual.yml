@@ -51,7 +51,7 @@ jobs:
             CURRENT_MINOR=$(echo "$VERSION" | cut -d. -f2)
             CURRENT_PATCH=$(echo "$VERSION" | cut -d. -f3)
             NEXT_MINOR=$((CURRENT_MINOR + 1))
-            RELEASE_VERSION="$CURRENT_MAJOR.$NEXT_MINOR.0"
+            RELEASE_VERSION="$CURRENT_MAJOR.$NEXT_MINOR.x"
           fi
 
            BACKPORT_PR_EXISTS=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
